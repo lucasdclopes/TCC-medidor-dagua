@@ -35,7 +35,9 @@ public class UserConfigResource {
 	@GET
 	public Response carregarConfigs() {
 		Map<ChaveUser,String> resposta = new HashMap<ChaveUser, String>(); 
-		userConfDao.todasConfigs().forEach(el -> resposta.put(el.getConfigNome(), el.getConfigValor()));
+		userConfDao.todasConfigs().forEach(el -> resposta.put(
+				el.getConfigNome(), el.getConfigNome().isSegredo()? "************" : el.getConfigValor()
+						));
 		return Response.ok(resposta).build();
 	}
 
