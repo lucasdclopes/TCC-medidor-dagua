@@ -12,10 +12,13 @@ import br.univesp.sensores.dto.queryparams.PaginacaoQueryParams;
 import br.univesp.sensores.dto.responses.MedicaoItemResp;
 import br.univesp.sensores.dto.responses.MedicaoListaResp;
 import br.univesp.sensores.entidades.MedicaoSensor;
+import br.univesp.sensores.helpers.ConfigHelper;
+import br.univesp.sensores.helpers.ConfigHelper.ChaveUser;
 import br.univesp.sensores.helpers.DaoHelper;
 import br.univesp.sensores.helpers.EnumHelper;
 import br.univesp.sensores.helpers.EnumHelper.IEnumDescritivel;
 import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
@@ -28,6 +31,9 @@ import jakarta.transaction.Transactional.TxType;
 public class MedicaoDao {
 	@PersistenceContext
 	private EntityManager em;
+	
+	@Inject 
+	private UserConfigDao userConfig;
 	
 	/**
 	 * Salva a entidade e retorna o ID auto gerado
@@ -160,10 +166,11 @@ public class MedicaoDao {
 		List<Object[]> rs = q.getResultList();
 		List<MedicaoItemResp> resultList = new ArrayList<>(); 
 
+		Integer alturaReservatorio = ConfigHelper.getInstance().getConfigInteger(ChaveUser.SENSOR_ALTURA_RESERVATORIO_CM, userConfig);
 		for (Object[] el : rs) {
 			int nrParam = 0;
 			resultList.add(new MedicaoItemResp(
-					(Long)el[nrParam++], (BigDecimal)el[nrParam++], ((Timestamp)el[nrParam]).toLocalDateTime())
+					(Long)el[nrParam++], (BigDecimal)el[nrParam++], ((Timestamp)el[nrParam]).toLocalDateTime(),alturaReservatorio)
 					);
 		}
 		

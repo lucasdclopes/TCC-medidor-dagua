@@ -48,16 +48,25 @@ public class ConfigHelper {
 		SIMULADOR_INTERVALO;
 	}
 	
-	public enum ChaveUser {		
-		EMAIL_NOME_REMETENTE,
-		EMAIL_ENDERECO_REMETENTE,
-		EMAIL_SMTP_HOSTNAME,
-		EMAIL_SMTP_PORTA,
-		EMAIL_SMTP_USER,
-		EMAIL_SMTP_SENHA,
+	public enum ChaveUser {	
+		EMAIL_NOME_REMETENTE(false),
+		EMAIL_ENDERECO_REMETENTE(false),
+		EMAIL_SMTP_HOSTNAME(false),
+		EMAIL_SMTP_PORTA(false),
+		EMAIL_SMTP_USER(true),
+		EMAIL_SMTP_SENHA(true),
 		
-		MONITORAMENTO_INTERVALO_MS,
-		SENSOR_ALTURA_RESERVATORIO_CM
+		MONITORAMENTO_INTERVALO_MS(false),
+		SENSOR_ALTURA_RESERVATORIO_CM(false);
+		
+		private boolean isSegredo;
+		ChaveUser(boolean isSegredo){
+			this.isSegredo = isSegredo;
+		}
+		
+		public boolean isSegredo() {
+			return isSegredo;
+		}
 	}
 	//singleton
 	public static ConfigHelper getInstance() {
