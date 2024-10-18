@@ -1,6 +1,9 @@
 package br.univesp.sensores.entidades;
 
+import br.univesp.sensores.helpers.ConfigHelper.ChaveUser;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
@@ -9,7 +12,8 @@ import jakarta.persistence.Table;
 public class UserConfig {
 
 	@Id
-	private String configNome;
+	@Enumerated(EnumType.STRING)
+	private ChaveUser configNome;
 	private String configValor;
 	
 	/**
@@ -18,12 +22,12 @@ public class UserConfig {
 	@Deprecated
 	public UserConfig() {}
 
-	public UserConfig(String configNome, String configValor) {
+	public UserConfig(ChaveUser configNome, String configValor) {
 		this.configNome = configNome;
 		this.configValor = configValor;
 	}
 
-	public String getConfigNome() {
+	public ChaveUser getConfigNome() {
 		return configNome;
 	}
 
@@ -31,7 +35,8 @@ public class UserConfig {
 		return configValor;
 	}
 	
-	public void alterarValor(String novoValor) {
+	public UserConfig alterarValor(String novoValor) {
 		this.configValor = novoValor;
+		return this;
 	}
 }

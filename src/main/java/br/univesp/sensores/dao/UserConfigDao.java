@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import br.univesp.sensores.entidades.UserConfig;
-import br.univesp.sensores.helpers.ConfigHelper.Chave_User;
+import br.univesp.sensores.helpers.ConfigHelper.ChaveUser;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -19,9 +19,9 @@ public class UserConfigDao {
 		return em.merge(config);
 	}
 	
-	public Optional<UserConfig> buscarPorId(final Chave_User chave) {
+	public Optional<UserConfig> buscarPorId(final ChaveUser chave) {
 		return Optional.ofNullable(
-				em.find(UserConfig.class, chave.name())
+				em.find(UserConfig.class, chave)
 				);
 	}
 	public List<UserConfig> todasConfigs(){

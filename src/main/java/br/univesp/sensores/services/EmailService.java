@@ -13,7 +13,7 @@ import br.univesp.sensores.dao.LogErrosDao;
 import br.univesp.sensores.dao.UserConfigDao;
 import br.univesp.sensores.entidades.LogErrosSistema;
 import br.univesp.sensores.helpers.ConfigHelper;
-import br.univesp.sensores.helpers.ConfigHelper.Chave_User;
+import br.univesp.sensores.helpers.ConfigHelper.ChaveUser;
 import jakarta.ejb.Stateless;
 import jakarta.enterprise.concurrent.ManagedThreadFactory;
 import jakarta.inject.Inject;
@@ -43,22 +43,22 @@ public class EmailService {
 		Properties prop = new Properties();
 		prop.put("mail.smtp.auth", true);
 		prop.put("mail.smtp.starttls.enable", "true");
-		prop.put("mail.smtp.host", config.getConfig(Chave_User.EMAIL_SMTP_HOSTNAME,userConf));
-		prop.put("mail.smtp.port", config.getConfigInteger(Chave_User.EMAIL_SMTP_PORTA,userConf));
-		prop.put("mail.smtp.ssl.trust", config.getConfig(Chave_User.EMAIL_SMTP_HOSTNAME,userConf));
+		prop.put("mail.smtp.host", config.getConfig(ChaveUser.EMAIL_SMTP_HOSTNAME,userConf));
+		prop.put("mail.smtp.port", config.getConfigInteger(ChaveUser.EMAIL_SMTP_PORTA,userConf));
+		prop.put("mail.smtp.ssl.trust", config.getConfig(ChaveUser.EMAIL_SMTP_HOSTNAME,userConf));
 		
 
 		Session session = Session.getInstance(prop, new Authenticator() {
 		    @Override
 		    protected PasswordAuthentication getPasswordAuthentication() {
-		        return new PasswordAuthentication(config.getConfig(Chave_User.EMAIL_SMTP_USER,userConf),config.getConfig(Chave_User.EMAIL_SMTP_SENHA,userConf));
+		        return new PasswordAuthentication(config.getConfig(ChaveUser.EMAIL_SMTP_USER,userConf),config.getConfig(ChaveUser.EMAIL_SMTP_SENHA,userConf));
 		    }
 		});
 		
 		
 		Message message = new MimeMessage(session);
 		try {
-			message.setFrom(new InternetAddress(config.getConfig(Chave_User.EMAIL_ENDERECO_REMETENTE,userConf)));
+			message.setFrom(new InternetAddress(config.getConfig(ChaveUser.EMAIL_ENDERECO_REMETENTE,userConf)));
 			message.setRecipients(	 
 					Message.RecipientType.TO,InternetAddress.parse(emails)		  
 					);

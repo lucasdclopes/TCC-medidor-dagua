@@ -48,7 +48,7 @@ public class ConfigHelper {
 		SIMULADOR_INTERVALO;
 	}
 	
-	public enum Chave_User {		
+	public enum ChaveUser {		
 		EMAIL_NOME_REMETENTE,
 		EMAIL_ENDERECO_REMETENTE,
 		EMAIL_SMTP_HOSTNAME,
@@ -86,7 +86,7 @@ public class ConfigHelper {
 		return valor;
 	}
 	
-	public String getConfig(Chave_User chave, UserConfigDao dao) { 
+	public String getConfig(ChaveUser chave, UserConfigDao dao) { 
 		return dao.buscarPorId(chave)
 				.orElseThrow(() -> new RuntimeException("A configuração " + chave  + " não existe no sistema"))
 				.getConfigValor();
@@ -96,7 +96,7 @@ public class ConfigHelper {
 		return toInteger(getConfig(chave),chave.name());
 	}
 	
-	public Integer getConfigInteger(Chave_User chave, UserConfigDao dao) { 
+	public Integer getConfigInteger(ChaveUser chave, UserConfigDao dao) { 
 		return toInteger(getConfig(chave,dao),chave.name());
 	}
 	
@@ -104,7 +104,7 @@ public class ConfigHelper {
 		return toBoolean(getConfig(chave),chave.name());	
 	}
 	
-	public Boolean getConfigBoolean(Chave_User chave, UserConfigDao dao) { 
+	public Boolean getConfigBoolean(ChaveUser chave, UserConfigDao dao) { 
 		return toBoolean(getConfig(chave,dao),chave.name());	
 	}
 	

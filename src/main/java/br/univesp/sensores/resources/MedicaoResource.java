@@ -16,7 +16,7 @@ import br.univesp.sensores.entidades.Alerta;
 import br.univesp.sensores.entidades.Alerta.TipoAlerta;
 import br.univesp.sensores.entidades.MedicaoSensor;
 import br.univesp.sensores.helpers.ConfigHelper;
-import br.univesp.sensores.helpers.ConfigHelper.Chave_User;
+import br.univesp.sensores.helpers.ConfigHelper.ChaveUser;
 import br.univesp.sensores.helpers.ResourceHelper;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -76,7 +76,7 @@ public class MedicaoResource {
 		e carrega o alerta que define com que temperatura o dispositivo será acionado
 		*/
 		NovaMedicaoResponse response = new NovaMedicaoResponse(
-				ConfigHelper.getInstance().getConfigInteger(Chave_User.MONITORAMENTO_INTERVALO_MS,userConfDao), 
+				ConfigHelper.getInstance().getConfigInteger(ChaveUser.MONITORAMENTO_INTERVALO_MS,userConfDao), 
 				alertaDao.buscarAlertasValidos().stream()
 				.filter(a -> a.deveHabilitarDispositivo() && a.getTipoAlerta() == TipoAlerta.DISTANCIA)
 				.sorted(Comparator.comparing(Alerta::getVlMax))
