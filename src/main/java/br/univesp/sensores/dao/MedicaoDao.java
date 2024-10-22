@@ -53,9 +53,9 @@ public class MedicaoDao {
 		String where = "WHERE 1 = 1 ";
 		String jpql = """
 				select new br.univesp.sensores.dto.responses.MedicaoItemResp (
-					m.idMedicao,m.vlDistancia,m.dtMedicao
+					m.idMedicao,m.vlDistancia,m.dtMedicao,%s
 				) from MedicaoSensor m 
-				""";
+				""".formatted(ConfigHelper.getInstance().getConfigInteger(ChaveUser.SENSOR_ALTURA_RESERVATORIO_CM, userConfig)); //força a usar o construtor que normaliza pela distancia do sensor
 		final String orderBy = " order by m.dtMedicao desc ";
 		Map<String,Object> params = new HashMap<>();
 		
@@ -165,12 +165,11 @@ public class MedicaoDao {
 		@SuppressWarnings("unchecked") //é do próprio framework..
 		List<Object[]> rs = q.getResultList();
 		List<MedicaoItemResp> resultList = new ArrayList<>(); 
-
-		Integer alturaReservatorio = ConfigHelper.getInstance().getConfigInteger(ChaveUser.SENSOR_ALTURA_RESERVATORIO_CM, userConfig);
 		for (Object[] el : rs) {
 			int nrParam = 0;
 			resultList.add(new MedicaoItemResp(
-					(Long)el[nrParam++], (BigDecimal)el[nrParam++], ((Timestamp)el[nrParam]).toLocalDateTime(),alturaReservatorio)
+					(Long)el[nrParam++], (BigDecimal)el[nrParam++], ((Timestamp)el[nrParam]).toLocalDateTime(), 
+					ConfigHelper.getInstance().getConfigInteger(ChaveUser.SENSOR_ALTURA_RESERVATORIO_CM, userConfig))
 					);
 		}
 		

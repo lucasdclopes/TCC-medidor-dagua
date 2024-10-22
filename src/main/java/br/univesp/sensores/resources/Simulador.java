@@ -103,7 +103,7 @@ public class Simulador {
 		Map<String,File> anexos = new HashMap<>();
 		anexos.put("temperature", config.getResourceFile("temperature.png"));
 		anexos.put("umidity", config.getResourceFile("umidity.png"));
-		mail.enviarEmail("lucas.dc.lopes@gmail.com",config.getEmailTemplateEmailAlerta(),anexos);
+		mail.enviarEmail("Teste","lucas.dc.lopes@gmail.com",config.getEmailTemplateEmailAlerta(),anexos);
 		return Response.ok().build();
 	}
 	

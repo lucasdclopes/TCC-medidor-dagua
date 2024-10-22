@@ -6,13 +6,13 @@ import java.time.LocalDateTime;
 public record AlertaItemResp(
 		Long idAlerta,
 		Boolean isHabilitado,
-		Integer tipoAlerta,
 		Integer intervaloEsperaSegundos,
 		BigDecimal vlMax,
 		BigDecimal vlMin,
 		LocalDateTime dtCriado,
 		LocalDateTime dtUltimoEnvio,
-		String destinatarios
+		String destinatarios,
+		Boolean habilitarDispositivo
 		) {
 
 }

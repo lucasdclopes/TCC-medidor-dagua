@@ -13,7 +13,6 @@ import br.univesp.sensores.dto.requests.NovaMedicao;
 import br.univesp.sensores.dto.responses.MedicaoListaResp;
 import br.univesp.sensores.dto.responses.NovaMedicaoResponse;
 import br.univesp.sensores.entidades.Alerta;
-import br.univesp.sensores.entidades.Alerta.TipoAlerta;
 import br.univesp.sensores.entidades.MedicaoSensor;
 import br.univesp.sensores.helpers.ConfigHelper;
 import br.univesp.sensores.helpers.ConfigHelper.ChaveUser;
@@ -73,12 +72,12 @@ public class MedicaoResource {
 		Long id = medicaoDao.salvarMedicao(med);
 				
 		/*mostra o intervalo de tempo que o dispositivo vai esperar até a próxima execução
-		e carrega o alerta que define com que temperatura o dispositivo será acionado
+		e carrega o alerta que define com que nível o dispositivo de bombeamento será acionado
 		*/
 		NovaMedicaoResponse response = new NovaMedicaoResponse(
 				ConfigHelper.getInstance().getConfigInteger(ChaveUser.MONITORAMENTO_INTERVALO_MS,userConfDao), 
 				alertaDao.buscarAlertasValidos().stream()
-				.filter(a -> a.deveHabilitarDispositivo() && a.getTipoAlerta() == TipoAlerta.DISTANCIA)
+				.filter(a -> a.deveHabilitarDispositivo())
 				.sorted(Comparator.comparing(Alerta::getVlMax))
 				.map(Alerta::getVlMax)
 				.findFirst()

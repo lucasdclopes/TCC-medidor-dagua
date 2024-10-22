@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
@@ -49,6 +50,7 @@ public class ConfigHelper {
 	}
 	
 	public enum ChaveUser {	
+		EMAIL_ALERTA_TITULO(false),
 		EMAIL_NOME_REMETENTE(false),
 		EMAIL_ENDERECO_REMETENTE(false),
 		EMAIL_SMTP_HOSTNAME(false),
@@ -109,6 +111,10 @@ public class ConfigHelper {
 		return toInteger(getConfig(chave,dao),chave.name());
 	}
 	
+	public BigDecimal getConfigBigDecimal (ChaveUser chave, UserConfigDao dao) { 
+		return toBigDecimal(getConfig(chave,dao),chave.name());
+	}
+
 	public Boolean getConfigBoolean(Chave chave) { 
 		return toBoolean(getConfig(chave),chave.name());	
 	}
@@ -129,6 +135,14 @@ public class ConfigHelper {
 	private Integer toInteger(String vlConfig, String vlChave) {
 		try {
 			return Integer.parseInt(vlConfig);
+		} catch (NumberFormatException e) {
+			throw new RuntimeException("O valor da chave " + vlChave  + " deveria ser numérico");
+		}
+	}
+	
+	private BigDecimal toBigDecimal(String vlConfig, String vlChave) {
+		try {
+			return new BigDecimal(vlConfig);
 		} catch (NumberFormatException e) {
 			throw new RuntimeException("O valor da chave " + vlChave  + " deveria ser numérico");
 		}

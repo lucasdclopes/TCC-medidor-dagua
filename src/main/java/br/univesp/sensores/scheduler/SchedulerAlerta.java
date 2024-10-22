@@ -8,6 +8,7 @@ import org.jboss.logging.Logger;
 
 import br.univesp.sensores.dao.AlertaDao;
 import br.univesp.sensores.dao.MedicaoDao;
+import br.univesp.sensores.dao.UserConfigDao;
 import br.univesp.sensores.dto.queryparams.DtParams;
 import br.univesp.sensores.dto.queryparams.PaginacaoQueryParams;
 import br.univesp.sensores.dto.responses.MedicaoItemResp;
@@ -35,6 +36,7 @@ public class SchedulerAlerta extends SchedulerTemplate {
 	@Inject private AlertaDao alertaDao;
 	@Inject private MedicaoDao medicaoDao;
 	@Inject private EmailService email;
+	@Inject private UserConfigDao userConfDao;
 	
 	@Override
 	protected void executarTarefaAgendada() {
@@ -62,7 +64,7 @@ public class SchedulerAlerta extends SchedulerTemplate {
 			LOGGER.info("executando verificação de alertas");
 			medicaoMaisRecente = medicoes.get(0).dtMedicao();
 			for (Alerta alerta : alertas) {
-				alerta.enviarAlerta(medicoes,email);
+				alerta.enviarAlerta(medicoes,email,userConfDao);
 				alertaDao.atualizar(alerta);
 			}
 	

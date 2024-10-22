@@ -13,13 +13,13 @@ go
 create table alerta (
 	idAlerta int not null identity(1,1),
 	isHabilitado bit not null,
-	tipoAlerta tinyint not null, --1 - TEMPERATURA. 2 - UMIDADE
 	intervaloEsperaSegundos smallint not null,
 	vlMax decimal(6,2) null, 
 	vlMin decimal(6,2) null,
 	dtCriado datetime2(2) not null,
 	dtUltimoEnvio datetime2(2) null,
 	destinatarios varchar(1000) not null,
+	habilitarDispositivo bit not null,
 	constraint PK__alerta primary key (idAlerta desc)
 ) 
 go
@@ -55,7 +55,8 @@ values
 ('EMAIL_SMTP_HOSTNAME','smtp.googlemail.com'),
 ('EMAIL_SMTP_PORTA','587'),
 ('EMAIL_NOME_REMETENTE','Mensagem Alerta'),
-('EMAIL_SMTP_SENHA','genm nmfg vwte bowm'),
+('EMAIL_ALERTA_TITULO','Alerta de nível d`água!'),
+('EMAIL_SMTP_SENHA','??????'),
 ('EMAIL_SMTP_USER','lucas.dev.noreply@gmail.com'),
 ('MONITORAMENTO_INTERVALO_MS','3000'),
 ('SENSOR_ALTURA_RESERVATORIO_CM','100')

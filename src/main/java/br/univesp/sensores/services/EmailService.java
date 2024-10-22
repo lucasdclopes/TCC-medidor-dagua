@@ -35,7 +35,7 @@ public class EmailService {
 	@Inject private LogErrosDao errosDao;
 	@Inject private UserConfigDao userConf;
 
-	public void enviarEmail(String emails, String mensagem, Map<String,File> anexos) {
+	public void enviarEmail(String titulo, String emails, String mensagem, Map<String,File> anexos) {
 		
 		ConfigHelper config = ConfigHelper.getInstance();
 		
@@ -62,7 +62,7 @@ public class EmailService {
 			message.setRecipients(	 
 					Message.RecipientType.TO,InternetAddress.parse(emails)		  
 					);
-			message.setSubject("Alerta de monitoramento de temperatura e umidade");
+			message.setSubject(titulo);
 			
 			MimeBodyPart mimeBodyPart = new MimeBodyPart();
 			mimeBodyPart.setContent(mensagem, "text/html; charset=utf-8");

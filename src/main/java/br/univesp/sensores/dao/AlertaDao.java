@@ -13,7 +13,6 @@ import br.univesp.sensores.dto.responses.AlertaItemResp;
 import br.univesp.sensores.dto.responses.AlertaListaResp;
 import br.univesp.sensores.dto.responses.AlertasEnviadosListaResp;
 import br.univesp.sensores.entidades.Alerta;
-import br.univesp.sensores.entidades.Alerta.TipoAlerta;
 import br.univesp.sensores.helpers.DaoHelper;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
@@ -50,14 +49,14 @@ public class AlertaDao {
 				);
 	}
 	
-	public static record FiltrosAlerta (TipoAlerta tipoAlerta, BigDecimal vlMax, BigDecimal vlMin) {}
+	public static record FiltrosAlerta (BigDecimal vlMax, BigDecimal vlMin) {}
 	public AlertaListaResp listar(final PaginacaoQueryParams paginacao, final DtParams dtParams, Optional<FiltrosAlerta> filtros) {
 		
 		String where = "WHERE 1 = 1 ";
 		String jpql = """
 				select new br.univesp.sensores.dto.responses.AlertaItemResp (
-					a.idAlerta,a.isHabilitado,a.tipoAlerta,a.intervaloEsperaSegundos,
-					a.vlMax,a.vlMin,a.dtCriado,a.dtUltimoEnvio,a.destinatarios
+					a.idAlerta,a.isHabilitado,a.intervaloEsperaSegundos,
+					a.vlMax,a.vlMin,a.dtCriado,a.dtUltimoEnvio,a.destinatarios,a.habilitarDispositivo
 				) from Alerta a 
 				""";
 		final String orderBy = " order by a.dtCriado desc ";
@@ -67,11 +66,6 @@ public class AlertaDao {
 		
 		if (filtros.isPresent()) {
 			FiltrosAlerta filtro = filtros.get();
-			
-			if (filtro.tipoAlerta != null) {
-				where += " AND tipoAlerta = :tipoAlerta ";
-				params.put("tipoAlerta", filtro.tipoAlerta.getCodigo());
-			}
 			
 			if (filtro.vlMin != null) {
 				where += " AND vlMin = :vlMin ";

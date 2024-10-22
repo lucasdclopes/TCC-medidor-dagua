@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import br.univesp.sensores.dao.UserConfigDao;
 import br.univesp.sensores.dto.responses.MedicaoItemResp;
 import br.univesp.sensores.erros.ErroNegocioException;
 import br.univesp.sensores.helpers.ConfigHelper;
 import br.univesp.sensores.helpers.ConfigHelper.Chave;
-import br.univesp.sensores.helpers.EnumHelper;
-import br.univesp.sensores.helpers.EnumHelper.IEnumDescritivel;
+import br.univesp.sensores.helpers.ConfigHelper.ChaveUser;
 import br.univesp.sensores.services.EmailService;
 import jakarta.mail.internet.AddressException;
 import jakarta.mail.internet.InternetAddress;
@@ -36,32 +36,6 @@ import jakarta.persistence.Table;
 public class Alerta implements Serializable {
 	
 	//private static final Logger LOGGER = Logger.getLogger( Alerta.class.getName());
-
-	public static TipoAlerta toAlerta(Integer codigo) {
-		return EnumHelper.getEnumFromCodigo(codigo,TipoAlerta.class);
-	}
-	public enum TipoAlerta implements IEnumDescritivel {
-		DISTANCIA(1,"Distancia");
-		private Integer codigo;
-		private String descAmigavel;
-		TipoAlerta(Integer codigo, String descAmigavel){
-			this.codigo = codigo;
-			this.descAmigavel = descAmigavel;
-		}
-		@Override
-		public Integer getCodigo() {
-			return this.codigo;		
-		}
-		
-		public String getDescAmigavel() {
-			return descAmigavel;
-		}
-		
-		@Override
-		public String getDescricao() {
-			return "Tipo de sensor";
-		}
-	}
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -69,7 +43,6 @@ public class Alerta implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long idAlerta;
 	private Boolean isHabilitado;
-	private Integer tipoAlerta;
 	private Integer intervaloEsperaSegundos;
 	private BigDecimal vlMax;
 	private BigDecimal vlMin;
@@ -90,7 +63,7 @@ public class Alerta implements Serializable {
 	@Deprecated
 	public Alerta() {}
 
-	public Alerta(TipoAlerta tipoAlerta, Integer intervaloEsperaSegundos, BigDecimal vlMax, BigDecimal vlMin, String destinatarios) {
+	public Alerta(Integer intervaloEsperaSegundos, BigDecimal vlMax, BigDecimal vlMin, String destinatarios, Boolean habilitarDispositivo) {
 		if (vlMax == null && vlMin == null)
 			throw new ErroNegocioException("Pelo menos o valor mínimo ou valor máximo precisa estar preenchido. Ambos estão vazios");
 		
@@ -99,14 +72,14 @@ public class Alerta implements Serializable {
 		
 		if (vlMax != null && vlMin != null && vlMax.compareTo(vlMin) <= 0 )
 			throw new ErroNegocioException("O valor do limite mínimo não pode ser igual ou maior que o valor do limite máximo");
-		
-		this.tipoAlerta = tipoAlerta.getCodigo();
+
 		this.intervaloEsperaSegundos = intervaloEsperaSegundos;
 		this.vlMax = vlMax;
 		this.vlMin = vlMin;
 		this.isHabilitado = true;
 		this.dtCriado = LocalDateTime.now();
 		this.destinatarios = destinatarios;
+		this.habilitarDispositivo = habilitarDispositivo;
 	}
 	
 	public void habilitar() {
@@ -136,28 +109,25 @@ public class Alerta implements Serializable {
 		
 	}	
 	
-	public void enviarAlerta(List<MedicaoItemResp> medicoes, EmailService email) {
-		TipoAlerta tipoAlerta = EnumHelper.getEnumFromCodigo(this.tipoAlerta,TipoAlerta.class);
+	public void enviarAlerta(List<MedicaoItemResp> medicoes, EmailService email, UserConfigDao userConfDao) {
 		
 		//verifica se já se passaram X segundos desde o último envio
 		if (this.dtUltimoEnvio != null && 
 				this.dtUltimoEnvio.until(LocalDateTime.now(), ChronoUnit.SECONDS) < this.intervaloEsperaSegundos)
 			return;
 		
-		medicoes.stream().filter(m -> {
-			return switch (tipoAlerta) {
-			case DISTANCIA -> checkRange(m.vlDistancia());
-			default -> throw new RuntimeException("Não existe definição para o tipo de alerta (" + tipoAlerta.toString() + ") informado");
-			};
-		}).findAny().ifPresent(medicao -> {
+		//Se algum alerta entrar nas condições, envia o alerta
+		medicoes.stream().filter(m -> 
+			checkRange(m.vlDistancia()) //verifica se algum alerta é maior que o limite máximo, ou menor que o limite mínimo
+		).findAny().ifPresent(medicao -> {
 			LocalDateTime agora = LocalDateTime.now();
 			
 			ConfigHelper config = ConfigHelper.getInstance();
 			Map<String,File> anexos = new HashMap<>();
-			anexos.put("temperature", config.getResourceFile("temperature.png"));
-			anexos.put("umidity", config.getResourceFile("umidity.png"));
+			anexos.put("level", config.getResourceFile("level.png"));
 			
-			email.enviarEmail(this.destinatarios,montarEmailAlerta(medicao),anexos);
+			String titulo = ConfigHelper.getInstance().getConfig(ChaveUser.EMAIL_ALERTA_TITULO, userConfDao);
+			email.enviarEmail(titulo, this.destinatarios,montarEmailAlerta(medicao),anexos);
 			this.alertasEnviados.add(new AlertaEnviado(this,agora));
 			this.dtUltimoEnvio = agora;
 		});
@@ -169,7 +139,6 @@ public class Alerta implements Serializable {
 		
 		String template = ConfigHelper.getInstance().getEmailTemplateEmailAlerta();
 		return template
-				.replace("${tipoAlerta}", this.getTipoAlerta().getDescAmigavel())
 				.replace("${idAlerta}", this.getIdAlerta().toString())
 				.replace("${vlDistancia}", medicao.vlDistancia().toPlainString())
 				.replace("${dtCriacao}", this.getDtCriado().format(datePattern))
@@ -208,10 +177,6 @@ public class Alerta implements Serializable {
 
 	public Boolean getIsHabilitado() {
 		return isHabilitado;
-	}
-
-	public TipoAlerta getTipoAlerta() {
-		return Alerta.toAlerta(tipoAlerta);
 	}
 
 	public Integer getIntervaloEsperaSegundos() {

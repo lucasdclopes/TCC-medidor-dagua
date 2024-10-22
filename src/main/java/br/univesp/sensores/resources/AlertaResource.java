@@ -13,7 +13,6 @@ import br.univesp.sensores.dto.responses.AlertaItemResp;
 import br.univesp.sensores.dto.responses.AlertaListaResp;
 import br.univesp.sensores.dto.responses.AlertasEnviadosListaResp;
 import br.univesp.sensores.entidades.Alerta;
-import br.univesp.sensores.entidades.Alerta.TipoAlerta;
 import br.univesp.sensores.erros.ErroNegocioException;
 import br.univesp.sensores.helpers.ConfigHelper;
 import br.univesp.sensores.helpers.ConfigHelper.Chave;
@@ -78,15 +77,13 @@ public class AlertaResource {
 		if (listar.page().totalRegistros() > limite)
 			throw new ErroNegocioException("Não é possível criar mais do que " + limite + " alertas. Exclua um alerta existente para poder criar um novo");
 
-		TipoAlerta tipoAlerta = Alerta.toAlerta(novoAlerta.tipoAlerta());
 		List<AlertaItemResp> existente = alertaDao.listar(
-				new PaginacaoQueryParams(100, 1), null,Optional.of(new FiltrosAlerta(tipoAlerta, novoAlerta.vlMax(), novoAlerta.vlMin()))
+				new PaginacaoQueryParams(100, 1), null,Optional.of(new FiltrosAlerta(novoAlerta.vlMax(), novoAlerta.vlMin()))
 				).alerta();
 		if (!existente.isEmpty())
 			throw new ErroNegocioException("O alerta #" + existente.get(0).idAlerta() + " já possuí os mesmos parâmetros de monitoramento");
 		
-		Alerta alerta = new Alerta(
-				Alerta.toAlerta(novoAlerta.tipoAlerta()), novoAlerta.intervaloEsperaSegundos(), novoAlerta.vlMax(), novoAlerta.vlMin(),novoAlerta.destinatarios()
+		Alerta alerta = new Alerta(novoAlerta.intervaloEsperaSegundos(), novoAlerta.vlMax(), novoAlerta.vlMin(),novoAlerta.destinatarios(), novoAlerta.habilitarDispositivo()
 				);
 		
 		Long id = alertaDao.salvar(alerta);
