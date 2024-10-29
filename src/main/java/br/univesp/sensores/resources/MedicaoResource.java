@@ -37,10 +37,10 @@ import jakarta.ws.rs.core.UriInfo;
 @Consumes(MediaType.APPLICATION_JSON)
 public class MedicaoResource {
 	
-	@Inject MedicaoDao medicaoDao;
-	@Inject AlertaDao alertaDao;
-	@Inject UserConfigDao userConfDao;
-	
+	@Inject private MedicaoDao medicaoDao;
+	@Inject private AlertaDao alertaDao;
+	@Inject private UserConfigDao userConfDao;
+	private ConfigHelper config = ConfigHelper.getInstance();
 	
 	
 	@GET
@@ -74,14 +74,16 @@ public class MedicaoResource {
 		/*mostra o intervalo de tempo que o dispositivo vai esperar até a próxima execução
 		e carrega o alerta que define com que nível o dispositivo de bombeamento será acionado
 		*/
+		Integer profundidade = config.getConfigInteger(ChaveUser.SENSOR_ALTURA_RESERVATORIO_CM, userConfDao);
+		BigDecimal nivelDeAlerta = alertaDao.buscarAlertasValidos().stream() //busca os alertas ligados
+				.filter(a -> a.deveHabilitarDispositivo()) //que tenham a opção de ligar o dispositivo (no caso, a bomba dágua)
+				.sorted(Comparator.comparing(Alerta::getVlMin)) //ordena pelo valor mínimo. Interessa ligar a bomba se o valor for baixo
+				.map(Alerta::getVlMin) //do objeto alerta, pega só o VlMin
+				.findFirst() //pega o primeiro item que foi localizado, considerando a ordenação acima
+				.orElse(new BigDecimal(-1)); //se não encontrar nada, força -1
 		NovaMedicaoResponse response = new NovaMedicaoResponse(
-				ConfigHelper.getInstance().getConfigInteger(ChaveUser.MONITORAMENTO_INTERVALO_MS,userConfDao), 
-				alertaDao.buscarAlertasValidos().stream()
-				.filter(a -> a.deveHabilitarDispositivo())
-				.sorted(Comparator.comparing(Alerta::getVlMax))
-				.map(Alerta::getVlMax)
-				.findFirst()
-				.orElse(BigDecimal.ZERO)
+				config.getConfigInteger(ChaveUser.MONITORAMENTO_INTERVALO_MS,userConfDao), 
+				MedicaoSensor.normalizarComProfundidade(nivelDeAlerta, profundidade) //precisa fazer aqui, pois o dispositivo não conhece a configuração de nível do usuário
 				);
 		
 		return Response.created(ResourceHelper.montarLocation(uriInfo,id)).entity(response).build();

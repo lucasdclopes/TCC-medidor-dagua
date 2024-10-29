@@ -4,4 +4,4 @@ import java.math.BigDecimal;
 
 public record NovaMedicaoResponse(
 		Integer intervalo,
-		BigDecimal tempAcionamento) {}
+		BigDecimal vlAcionamento) {}

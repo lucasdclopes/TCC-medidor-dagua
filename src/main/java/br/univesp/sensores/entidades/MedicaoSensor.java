@@ -51,5 +51,15 @@ public class MedicaoSensor implements Serializable {
 		return dtMedicao;
 	}
 	
+	/**
+	 * Ajusta o valor medido considerando a profundidade do recipiente definida pelo usuário
+	 * @param vlDistancia distancia medida
+	 * @param profundidade profundidade configurada
+	 */
+	public static BigDecimal normalizarComProfundidade(BigDecimal vlDistancia, Integer profundidade) {
+		vlDistancia = new BigDecimal(profundidade).subtract(vlDistancia);
+		return (vlDistancia.compareTo(BigDecimal.ZERO) < 0)? BigDecimal.ZERO : vlDistancia; //se for menor do que zero, usa zero.
+	}
+	
 	
 }

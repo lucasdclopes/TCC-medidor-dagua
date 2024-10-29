@@ -197,45 +197,6 @@ public class MedicaoDao {
 				DaoHelper.infoPaginas(paginacao, rsCount.longValue(), resultList.size()),
 				resultList
 				);
-				
+					
 	}
-	/*
-	public MedicaoListaResp listarAgrupado(final PaginacaoQueryParams paginacao, final DtParams dtParams, TipoAgrupamento tipoAgrupamento) {
-		
-		Integer total = 0;
-		String where = "WHERE 1 = 1 ";
-		String campoGroupBy = "cast(cast(m.dtMedicao as LocalDate) as LocalDateTime) ";
-		String groupBy = " group by (" + campoGroupBy + ")";
-		String jpql = """
-				select new br.univesp.sensores.dto.responses.MedicaoItemResp (
-					ROW_NUMBER() over (order by %s desc) as idMedicaoRow
-					,cast(avg(m.vlTemperatura) as BigDecimal),cast(avg(m.vlUmidade) as BigDecimal),%s as dtAgrp
-				) from MedicaoSensor m 
-				""".formatted(campoGroupBy,campoGroupBy);
-		//final String orderBy = " order by m.dtMedicao desc ";
-		Map<String,Object> params = new HashMap<>();
-		
-		where += DaoHelper.addWhereRangeData(params, dtParams, "dtMedicao");
-		
-		jpql += where + groupBy;
-				//orderBy;
-		TypedQuery<MedicaoItemResp> query = em.createQuery(jpql, MedicaoItemResp.class);
-		params.forEach(query::setParameter);
-		
-
-		String jpqlCount = """
-			select count(1) from MedicaoSensor m 
-			""" + where + groupBy;
-		
-		TypedQuery<Long> queryCount = em.createQuery(jpqlCount, Long.class);
-		params.forEach(queryCount::setParameter);
-		total = queryCount.getResultList().size();
-		
-		List<MedicaoItemResp> resultList = paginacao.configurarPaginacao(query).getResultList();
-		return new MedicaoListaResp(
-				DaoHelper.infoPaginas(paginacao, total.longValue(), resultList.size()),
-				resultList
-				);
-				
-	}*/
 }
