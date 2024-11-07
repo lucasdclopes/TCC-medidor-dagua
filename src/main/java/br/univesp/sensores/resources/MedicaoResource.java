@@ -37,8 +37,11 @@ import jakarta.ws.rs.core.UriInfo;
 @Consumes(MediaType.APPLICATION_JSON)
 public class MedicaoResource {
 	
+	//trabalha com a tabela de medições feitas
 	@Inject private MedicaoDao medicaoDao;
+	//trabalha com a tabela de alertas
 	@Inject private AlertaDao alertaDao;
+	//trabalha com a tabela de configurações do usuário
 	@Inject private UserConfigDao userConfDao;
 	private ConfigHelper config = ConfigHelper.getInstance();
 	
@@ -50,15 +53,16 @@ public class MedicaoResource {
 		if (!tempoReal) 
 			paginacao.overrideMaxItens(1000);
 		
-		MedicaoListaResp medicoes = null;
-		if (tipoAgrupamento != null) 
-			medicoes = medicaoDao.listarAgrupado(paginacao, dtParams, TipoAgrupamento.toAgrupamento(tipoAgrupamento));
-		else 
-			medicoes = medicaoDao.listar(paginacao,dtParams,tempoReal);
+		//Usa o método de dados agrupador (listarAgrupado) se algum tipo de agrupamento foi definido
+		MedicaoListaResp medicoes = (tipoAgrupamento != null)? 	
+				medicaoDao.listarAgrupado(paginacao, dtParams, TipoAgrupamento.toAgrupamento(tipoAgrupamento))
+				:medicaoDao.listar(paginacao,dtParams,tempoReal);
 		
+		//Se nada foi encontrado, devolve uma resposta http vazia
 		if (medicoes.medicoes().isEmpty())
 			return Response.status(Status.NO_CONTENT).build();
 		
+		//Devolve os resultados encontrados. A classe java é transformada em JSON aqui
 		return Response.ok().entity(medicoes.medicoes())
 				.header("page-quantidade", medicoes.page().pageQuantidade())
 				.header("page-has-proxima", medicoes.page().hasProxima())
@@ -66,10 +70,12 @@ public class MedicaoResource {
 	}
 	
 	@POST
-	public Response salvarMedicao(final NovaMedicao novaMedicao, @Context UriInfo uriInfo) {
+	public Response salvarMedicao(
+			final NovaMedicao novaMedicao, //dados do JSON recebido
+			@Context UriInfo uriInfo) {
 		
 		MedicaoSensor med = new MedicaoSensor(novaMedicao.vlDistancia());
-		Long id = medicaoDao.salvarMedicao(med);
+		Long id = medicaoDao.salvarMedicao(med); //salva no banco de dados
 				
 		/*mostra o intervalo de tempo que o dispositivo vai esperar até a próxima execução
 		e carrega o alerta que define com que nível o dispositivo de bombeamento será acionado

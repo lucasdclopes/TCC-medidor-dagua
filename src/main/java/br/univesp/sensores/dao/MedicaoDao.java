@@ -55,7 +55,8 @@ public class MedicaoDao {
 				select new br.univesp.sensores.dto.responses.MedicaoItemResp (
 					m.idMedicao,m.vlDistancia,m.dtMedicao,%s
 				) from MedicaoSensor m 
-				""".formatted(ConfigHelper.getInstance().getConfigInteger(ChaveUser.SENSOR_ALTURA_RESERVATORIO_CM, userConfig)); //força a usar o construtor que normaliza pela distancia do sensor
+				""".formatted(ConfigHelper.getInstance().getConfigInteger(ChaveUser.SENSOR_ALTURA_RESERVATORIO_CM, userConfig)); 
+		//força a usar o construtor que normaliza pela distancia do sensor
 		final String orderBy = " order by m.dtMedicao desc ";
 		Map<String,Object> params = new HashMap<>();
 		
@@ -173,6 +174,8 @@ public class MedicaoDao {
 					);
 		}
 		
+		//Executa um COUNT no banco de dados com os mesmos parâmetros da query principal
+		//afim de saber o total de resultados, o que facilita na paginação
 		String sqlCount = """
 			select 	top 1  
 				COUNT(*) OVER () AS TotalRecords

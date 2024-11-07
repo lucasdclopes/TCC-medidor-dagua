@@ -21,22 +21,10 @@ public class MedicaoSensor implements Serializable {
 	private Long idMedicao;
 	private BigDecimal vlDistancia;
 	private LocalDateTime dtMedicao ;
-	
-	/**
-	 * Construtor exclusivo para o framework Jakarta.
-	 */
-	@Deprecated
-	public MedicaoSensor() {}
-	
 
 	public MedicaoSensor(BigDecimal vlDistancia) {
 		this.vlDistancia = vlDistancia;
 		this.dtMedicao = LocalDateTime.now();
-	}
-
-
-	public static long getSerialversionuid() {
-		return serialVersionUID;
 	}
 
 	public Long getIdMedicao() {
@@ -50,6 +38,12 @@ public class MedicaoSensor implements Serializable {
 	public LocalDateTime getDtMedicao() {
 		return dtMedicao;
 	}
+	
+	/**
+	 * Construtor exclusivo para o framework Jakarta.
+	 */
+	@Deprecated
+	public MedicaoSensor() {}
 	
 	/**
 	 * Ajusta o valor medido considerando a profundidade do recipiente definida pelo usuário

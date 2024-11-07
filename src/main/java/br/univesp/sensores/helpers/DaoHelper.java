@@ -16,12 +16,11 @@ public class DaoHelper {
 	 */
 	public static String addWhereRangeData(
 			Map<String,Object> params, final DtParams dtParams, final String nomeCampo) {
-		
 
 		String paramsWhere = "";
 		if (dtParams != null) {
 			
-			dtParams.validar();
+			dtParams.validar(); //verifica se são datas válidas
 			
 			if (dtParams.getDtInicial() != null) {
 				paramsWhere += " AND " + nomeCampo + " >= :dtInicial ";
@@ -31,12 +30,9 @@ public class DaoHelper {
 			if (dtParams.getDtFinal() != null) {
 				paramsWhere += " AND " + nomeCampo + " <= :dtFinal ";
 				params.put("dtFinal", dtParams.getDtFinal());
-			}
-			
+			}	
 		}
-		
 		return paramsWhere;
-		
 	}
 	
 	public record Page (Long totalRegistros, Long pageQuantidade,Boolean hasProxima) {}
