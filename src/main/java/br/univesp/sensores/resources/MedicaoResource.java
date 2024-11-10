@@ -86,10 +86,11 @@ public class MedicaoResource {
 				.sorted(Comparator.comparing(Alerta::getVlMin)) //ordena pelo valor mínimo. Interessa ligar a bomba se o valor for baixo
 				.map(Alerta::getVlMin) //do objeto alerta, pega só o VlMin
 				.findFirst() //pega o primeiro item que foi localizado, considerando a ordenação acima
+				.map(vl -> MedicaoSensor.normalizarComProfundidade(vl, profundidade)) //precisa fazer aqui, pois o dispositivo não conhece a configuração de nível do usuário
 				.orElse(new BigDecimal(-1)); //se não encontrar nada, força -1
 		NovaMedicaoResponse response = new NovaMedicaoResponse(
 				config.getConfigInteger(ChaveUser.MONITORAMENTO_INTERVALO_MS,userConfDao), 
-				MedicaoSensor.normalizarComProfundidade(nivelDeAlerta, profundidade) //precisa fazer aqui, pois o dispositivo não conhece a configuração de nível do usuário
+				nivelDeAlerta
 				);
 		
 		return Response.created(ResourceHelper.montarLocation(uriInfo,id)).entity(response).build();
